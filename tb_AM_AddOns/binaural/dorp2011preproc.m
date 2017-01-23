@@ -1,8 +1,8 @@
-function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin);
-% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin);
+function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin)
+% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin)
 %
 % 1. Description:
-%  Auditory model from van Dorp et. al. 2001
+%  Auditory model from van Dorp et. al. 2011
 %   Usage: [outsig, fc, par] = dorp2011preproc(insig,fs);
 %          [outsig, fc, par] = dorp2011preproc(insig,fs,...);
 %
@@ -112,7 +112,7 @@ if ~isnumeric(fs) || ~isscalar(fs) || fs<=0
   error('%s: fs must be a positive scalar.',upper(mfilename));
 end;
 
-definput.import = {'dorp2011','auditoryfilterbank','ihcenvelope','adaptloop'};
+definput.import = {'dorp2011','auditoryfilterbank_','ihcenvelope','adaptloop_'};
 definput.importdefaults={'gtf_dorp','ihc_breebaart','adt_dorp'};
 definput.keyvals.subfs=[];
 
@@ -157,6 +157,12 @@ if flags.do_exclude
     keyvals.N_no_silence   = length(idx_no_silence)*keyvals.hopsize*fs;
     keyvals.idx_no_silence = idx_no_silence;
 else
+    if size(insig,2) == 2
+        bDiotic = 0;
+    else
+        bDiotic = 1;
+    end
+    
     keyvals.N              = N;
     keyvals.N_no_silence   = N;
     keyvals.idx_no_silence = 1:size(insig,1)/(keyvals.hopsize*fs);
@@ -208,20 +214,7 @@ outsig = adaptloop(outsig,fs,'argimport',flags,keyvals);
 %% Binaural processor (Envelopment)
 par = [];
 if flags.do_binaural & bDiotic == 0
-    
-    for i = 1:size(outsig,2)
-        [itd(:,i),t_itd] = eicell_Dorp2011(squeeze(outsig(:,i,:)),fs);
-        sprintf('band %d of %d\n',i,size(outsig,2))
-        
-    end
-    par.t_itd = t_itd;
-    par.itd   = itd;
-    % figure;
-    % plot_itd(t_itd,itd);
-
-    % figure;
-    % plot(t_itd,itd)
-    % legend('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16')
+    % Not validated yet
 end
 
 %% 8-Hz Low-pass filter

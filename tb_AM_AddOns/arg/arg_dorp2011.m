@@ -2,23 +2,20 @@ function definput = arg_dorp2011(definput)
 % function definput = arg_dorp2011(definput)
 %
 % 1. Description:
+%       Loads arguments to be used by the dorp2011preproc function.
+% 
+% 2. Additional info:
+%       Tested cross-platform: Yes
 %
-% 2. Stand-alone example:
-%
-% 3. Additional info:
-%       Tested cross-platform: No
-%
-% Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2016
+% Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2017
 % Created on    : 11/07/2016
-% Last update on: 29/07/2016 
-% Last use on   : 18/11/2016 
+% Last update on: 23/01/2017 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% General options of the model:
 definput.keyvals.order  = 1; % order outer- middle-ear filter
-% Set option outermiddleear to 'outermiddleear' and therefore: do_outermiddleear to 1
 definput.flags.outermiddleear={'outermiddleear','nooutermiddleear'}; 
-definput.flags.binaural_proc = {'binaural','no_binaural'};
+definput.flags.binaural_proc = {'no_binaural','binaural'}; % binaural processor not implemented yet
 
 %% For binaural processor:
 definput.keyvals.muASW = 2.00e-2;
