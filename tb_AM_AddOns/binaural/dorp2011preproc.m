@@ -7,14 +7,11 @@ function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, vararg
 %          [outsig, fc, par] = dorp2011preproc(insig,fs,...);
 %
 %   Input parameters:
-%        insig  : input acoustic signal.
-%        fs     : sampling rate.
-%  
-%   The input must have dimensions time x left/right channel x signal no.
-%   The output has dimensions time x frequency x signal no. 
+%        insig  : input (acoustic) signal
+%        fs     : sampling frequency [Hz].
 %  
 %   Output parameters:
-%       outsig  : output signal scaled in Model Units.
+%       outsig  : output signal (Internal representation) scaled in Model Units.
 %       fc      : centre frequencies of the filter bank.
 %       par     : parameters returned by the central processor:
 %           - fc: centre frequencies of the filter bank.
@@ -35,18 +32,12 @@ function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, vararg
 %           - FL_frame: foreground level per analysis frame.
 %           - BL_frame: background level per analysis frame.
 %           - TL_frame: total level per analysis frame.
-%           - pRev
-%           - pRev_frame
-%           - sRev
-%           - pClar
-%           - pClar_frame
-%           - sClar
-%           - pASW
-%           - sASW
-%           - pLEV
-%           - sLEV
-%           - Psimin
-%           - Psimin_dip
+%           * Reverberance estimates:
+%               - pRev      : reverberance estimate for the whole sound
+%               - pRev_frame: reverberance per analysis frame
+%           * Clarity estimates:
+%               - pClar     : clarity estimate for the whole sound
+%               - pClar_frame: clarity per analysis frame
 % 
 %   The Dorp 2011 model consists of the following stages:
 %   
@@ -58,16 +49,12 @@ function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, vararg
 %   5) Absolute threshold of hearing: in this implementation this was omitted
 %   6) an adaptation stage modelling nerve adaptation by a cascade of 5 loops.
 %   7) Signal smoothing by applying a single-pole low-pass filter with a time
-%      constant of 20-ms (fcut = 8 Hz; as in dau1996, breebaart2001). 
-%   8) an excitation-inhibition (EI) cell model (not implemented yet).
+%      constant of 20-ms (fcutoff = 8 Hz; as in dau1996, breebaart2001). 
+%   8) Central processor
 %
-%   Parameters for AUDITORYFILTERBANK, IHCENVELOPE, ADAPTLOOP and EICELL 
-%   can be passed at the end of the line of input arguments.
+% 2. Stand-alone examples:
 %
-%   Examples
-%   --------
-%
-%   The following code sets up a simple test example :
+% % 2.1 The following code sets up a simple test example:
 %     % Setup parameters
 %     fs      = 44100;            % Sampling rate
 %     T       = 1;              % Duration
@@ -83,21 +70,23 @@ function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, vararg
 %     x2 = n1*sqrt((1+rho)/2) - n2*sqrt((1-rho)/2);
 %
 %     % % Run the model and plot it
-%     [ei_map, fc] = dorp2011preproc([x1,x2], fs);
-%     [idx]        = dorp2011preproc([x1,x2], fs,'central_envelopment');
+%     insig = [x1,x2];
+%     [outsig, fc, par] = dorp2011preproc(insig, fs);
 % 
+% % 2.2 Another example (replace the 'file' by a valide file name in your
+% %     local computer:
 %     file = 'D:\Databases\dir01-Instruments\Piano\00-Original-files\pressionexpeCd5.wav';
-%     [insig fs] = Wavread(file);
-%     lvl = rmsdb(insig)+100;
-%     [par psi] = raa(file,100);
+%     [insig fs] = audioread(file);
+%     [outsig, fc, par] = dorp2011preproc(insig, fs);
 % 
 %   See also: headphonefilter_Dorp2011, auditoryfilterbank, ihcenvelope, adaptloop
 %
-%   References: breebaart2001binaural
+%   References: breebaart2001binaural, osses2017
+%
+%   AUTHOR : Alejandro Osses Vecchi (ale.a.osses@gmail.com) 
+%           (adapted from a code programmed by Peter L. Soendergaard)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%   AUTHOR : Alejandro Osses V., adapted partially from a code programmed
-%            by Peter L. Soendergaard
-  
 % ------ Checking of input parameters ------------
 
 if nargin<2
@@ -129,40 +118,48 @@ if flags.do_multiple_one_second
     insig = insig(1:N,:);
 
     if Nactual-N ~= 0
-        fprintf('The input signal has a length that is not a multiple of 1 s\n\t discarding %.0f samples\n',Nactual-N);
+        fprintf('The input signal is %.2f-s long (not a multiple of 1 s)\n\t We will discard %.0f samples\n',Nactual/fs,Nactual-N);
         if N == 0
             error('The input signal has to be at least 1 second long');
+        else
+            fprintf('The input signal is %.2f-s long\n',Nactual/fs);
         end
     end
+end
+
+if size(insig,2) == 2
+    % if the input signal is stereo (normal config) then is NOT diotic
+    bDiotic = 0;
+elseif size(insig,2) == 1 
+    % if the input signal is mono then the 'Left' channel will be duplicated
+    % and used as 'Right' channel. This is known as diotic
+    bDiotic = 1;
 end
 
 % ------ do the computation -------------------------
 if flags.do_exclude
     
-    dBFS = 100;
-    dBA = Do_SLM(insig,fs,'A','f',dBFS);
-    if size(insig,2) == 2
+    dBFS = dbspl(1); % 100 dB
+    dBA = Do_SLM(insig,fs,'A','f',dBFS); 
+    
+    if bDiotic == 0
         dBA = 10*log10(0.5*abs(10.^(dBA(:,1)/10)+10.^(dBA(:,2)/10)));
-        bDiotic = 0;
-    else
-        bDiotic = 1;
     end
     
     LAeq     = Get_Leq( dBA,fs);
-    LAeq1sec = Get_Leq( dBA,fs, keyvals.hopsize); % 1-sec LAeq
+    LAeq1sec = Get_Leq( dBA,fs, keyvals.hopsize,keyvals.framelen); % 1-sec LAeq
 
-    idx_no_silence = find( (LAeq1sec) >  LAeq-30 );
+    idx_no_silence = find( (LAeq1sec) >  LAeq-30 ); % looks for analysis frames
+                                                    % with average levels greater than
+                                                    % LAeq-30 [dB]
+    NFrames = length(LAeq1sec); % NFrames = (siglen - framelen)/hopsize + 1
+    NFrames_no_sill = length(idx_no_silence);
+    ratioFrames = NFrames_no_sill/NFrames;
     
-    keyvals.N              = length(LAeq1sec)      *keyvals.hopsize*fs;
-    keyvals.N_no_silence   = length(idx_no_silence)*keyvals.hopsize*fs;
+    keyvals.N              = N; % multiples of 1-s
+    keyvals.N_no_silence   = round(ratioFrames*N); 
     keyvals.idx_no_silence = idx_no_silence;
 else
-    if size(insig,2) == 2
-        bDiotic = 0;
-    else
-        bDiotic = 1;
-    end
-    
     keyvals.N              = N;
     keyvals.N_no_silence   = N;
     keyvals.idx_no_silence = 1:size(insig,1)/(keyvals.hopsize*fs);
@@ -186,12 +183,14 @@ if ~isempty(keyvals.subfs)
     outsig = fftresample(outsig,round(length(outsig)/fs*keyvals.subfs));
     fs = keyvals.subfs;
 
+    N = size(outsig,1);
+
     if flags.do_exclude
-        keyvals.N            = length(LAeq1sec)      *keyvals.hopsize*fs;
-        keyvals.N_no_silence = length(idx_no_silence)*keyvals.hopsize*fs;
+        keyvals.N            = N;
+        keyvals.N_no_silence = round(ratioFrames*N); 
     else
-        keyvals.N            = size(outsig,1);
-        keyvals.N_no_silence = keyvals.N;
+        keyvals.N            = N;
+        keyvals.N_no_silence = N;
     end
 end;
 
@@ -208,21 +207,15 @@ end;
 outsig = ihcenvelope(outsig,fs,'argimport',flags,keyvals);
 
 %% non-linear adaptation loops
-% keyvals.limit = 10;
-outsig = adaptloop(outsig,fs,'argimport',flags,keyvals);
-
-%% Binaural processor (Envelopment)
-par = [];
-if flags.do_binaural & bDiotic == 0
-    % Not validated yet
-end
+outsig = adaptloop(outsig,fs,'argimport',flags,keyvals); % default is with no limitation
 
 %% 8-Hz Low-pass filter
-[mlp_b, mlp_a, tc] = IRIfolp(8,fs); % 8 Hz LPF
+[mlp_b, mlp_a] = IRIfolp(8,fs); % 8 Hz LPF
 outsig = filter(mlp_b,mlp_a,outsig);
    
 %% Central processor:
 % We set psi following RAA nomenclature
+par = [];
 par.bDiotic    = bDiotic;
 par.fc         = transpose(fc);
 par.fs         = fs;
@@ -245,6 +238,8 @@ switch nargout
         [par, Psi_dir] = dorp2011centralprocessor(par,fs,flags,keyvals);
     case 5 
         [par, Psi_dir, Psi_rev] = dorp2011centralprocessor(par,fs,flags,keyvals);
+    otherwise
+        error('At least three output parameters should be requested')
 end
 
 keyvals.idx_no_silence(keyvals.idx_no_silence > par.numFrames)=[];

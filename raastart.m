@@ -12,7 +12,7 @@ function raastart
 % 
 % Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2017
 % Created on    : 20/01/2017
-% Last use on   : 20/01/2017
+% Last edited on: 03/02/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 dirmain  = [cd delim];
@@ -30,6 +30,8 @@ end
 dir = [dirmain 'tb_AM' delim]; addpath(dir);
 amtstart;
 
+dir = [dirmain 'Utility'      delim]; addpath(dir);
+
 disp(['EOF: ' mfilename])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,8 +39,9 @@ function subdirs = il_get_AM_AddOns_paths(dir)
 
 subdirs{1} = [dir 'arg'         delim];
 subdirs{2} = [dir 'binaural'    delim];
-subdirs{3} = [dir 'filters'     delim];
-subdirs{4} = [dir 'modelstages' delim];
+subdirs{3} = [dir 'demos'       delim];
+subdirs{4} = [dir 'filters'     delim];
+subdirs{5} = [dir 'modelstages' delim];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function delimiter = delim

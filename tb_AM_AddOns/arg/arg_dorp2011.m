@@ -9,19 +9,12 @@ function definput = arg_dorp2011(definput)
 %
 % Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2017
 % Created on    : 11/07/2016
-% Last update on: 23/01/2017 
+% Last update on: 03/02/2017 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% General options of the model:
 definput.keyvals.order  = 1; % order outer- middle-ear filter
 definput.flags.outermiddleear={'outermiddleear','nooutermiddleear'}; 
-definput.flags.binaural_proc = {'no_binaural','binaural'}; % binaural processor not implemented yet
-
-%% For binaural processor:
-definput.keyvals.muASW = 2.00e-2;
-definput.keyvals.nuASW = 5.63e2;
-definput.keyvals.muLEV = 2.76e-2;
-definput.keyvals.nuLEV = 6.80e2;
 
 %% For central processor:
 definput.keyvals.Psimin = 0.34; % 'Optimisation' by running m20160714_fourth_report_MBBM_testing_vanDorp
