@@ -15,39 +15,31 @@ function raastart
 % Last edited on: 03/02/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-dirmain  = [cd delim];
-bSuccess = isdir([dirmain 'tb_AM_AddOns' delim]);
+dirmain  = [cd filesep];
+bSuccess = exist([dirmain 'tb_AM_AddOns' filesep],'dir');
 
 if bSuccess == 0
     error('Please set the current MATLAB directory to the location of the RAA model and re-run this script');
 end
 
-dir = [dirmain 'tb_AM_AddOns' delim]; addpath(dir);
+dir = [dirmain 'tb_AM_AddOns' filesep]; addpath(dir);
 subdirs = il_get_AM_AddOns_paths(dir);
 for i = 1:length(subdirs)
   addpath(subdirs{i})
 end
-dir = [dirmain 'tb_AM' delim]; addpath(dir);
+dir = [dirmain 'tb_AM' filesep]; addpath(dir);
 amtstart;
 
-dir = [dirmain 'Utility'      delim]; addpath(dir);
+dir = [dirmain 'Utility' filesep]; addpath(dir);
 
 disp(['EOF: ' mfilename])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function subdirs = il_get_AM_AddOns_paths(dir)
 
-subdirs{1} = [dir 'arg'         delim];
-subdirs{2} = [dir 'binaural'    delim];
-subdirs{3} = [dir 'demos'       delim];
-subdirs{4} = [dir 'filters'     delim];
-subdirs{5} = [dir 'modelstages' delim];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function delimiter = delim
-
-if isunix
-    delimiter = '/';
-else
-    delimiter = '\';
-end
+subdirs{1} = [dir 'arg'         filesep];
+subdirs{2} = [dir 'binaural'    filesep];
+subdirs{3} = [dir 'common'      filesep];
+subdirs{4} = [dir 'experiments' filesep];
+subdirs{5} = [dir 'models'      filesep];
+subdirs{6} = [dir 'modelstages' filesep];

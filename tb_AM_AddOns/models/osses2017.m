@@ -1,5 +1,5 @@
-function [pRev,Level,outputs] = demo_raa(filename,dBFS)
-% function [pRev,Level,outputs] = demo_raa(filename,dBFS)
+function [pRev,Level,outputs] = osses2017(filename,dBFS)
+% function [pRev,Level,outputs] = osses2017(filename,dBFS)
 %
 % 1. Description:
 %       This script implements the Room Acoustic Analyser (RAA) model to
@@ -44,6 +44,7 @@ function [pRev,Level,outputs] = demo_raa(filename,dBFS)
 %       See reference Osses2017
 %       Tested cross-platform: Yes
 % 
+% Old name in RAA v1.0: demo_raa.m
 % Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2017
 % Created on    : 21/01/2017
 % Last update on: 03/02/2017 
@@ -80,7 +81,7 @@ end
 Level(3) = Get_Leq(dB); % LZeq
 Level(4) = max(dB); % LZmax
 
-[outsig, fc, par] = dorp2011preproc(insig, fs, 'subfs',subfs);
+[outsig, fc, par] = dorp2011(insig, fs, 'subfs',subfs);
 
 pRev(1) = median(par.pRev_frame);
 pRev(2) = min(par.pRev_frame);

@@ -1,0 +1,12 @@
+{
+    "title": "Binaural auditory model RAA", 
+    "creators": [
+        {
+            "orcid": "0000-0001-8028-4936", 
+            "affiliation": "Laboratoire des systèmes perceptifs, Département d'études cognitives, Ecole Normale Supérieure, PSL University, CNRS, Paris, France", 
+            "name": "Alejandro Osses Vecchi"
+        }
+    ],
+    "license": "cc-by-nc",
+    "keywords": ["binaural", "auditory modelling","reverberation","reverberance","perception"]
+}

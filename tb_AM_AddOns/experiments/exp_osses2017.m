@@ -1,5 +1,5 @@
-function demo_osses2017
-% function demo_osses2017
+function exp_osses2017
+% function exp_osses2017
 %
 % 1. Description:
 % 
@@ -26,6 +26,7 @@ function demo_osses2017
 %       See reference Osses2017
 %       Tested cross-platform: Yes
 % 
+% Old name in RAA v1.0: demo_osses2017.m
 % Programmed by Alejandro Osses, HTI, TU/e, the Netherlands, 2014-2017
 % Created on    : 21/01/2017
 % Last update on: 03/02/2017 
@@ -39,14 +40,16 @@ if bCalc
     
     dir_where = raabasepath; % Example path in Windows:  dir_where = 'D:\MATLAB_RAA\tb_AM_AddOns\';
                              % Example path in Unix sys: dir_where = '/home/alejandro/Documenten/MATLAB_RAA/tb_AM_AddOns/';
-    dir_where = [dir_where 'auxdata' filesep 'osses2017' filesep];
+    dir_where = [dir_where 'tb_AM_AddOns' filesep 'auxdata' filesep 'osses2017' filesep];
 
     files = il_get_filenames;
 
-    dBFS = dbspl(1); % 100 dB SPL attributed to an amplitude of 1, AMT default
+    dBFS = 100; % 100 dB SPL attributed to an amplitude of 1, old AMT default
 
-    for i = 1:length(files)
-        [pRev(i,:),Level(i,:),outputs] = demo_raa([dir_where files{i}],dBFS);
+    N = length(files);
+    for i = 1:N
+        fprintf('Processing file %.0f of %.0f\n',i,N);
+        [pRev(i,:),Level(i,:),outputs] = osses2017([dir_where files{i}],dBFS);
     end
 
     pRev_est = reshape(pRev(:,1),8,6);

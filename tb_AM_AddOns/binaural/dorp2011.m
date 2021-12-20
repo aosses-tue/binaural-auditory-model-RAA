@@ -1,10 +1,10 @@
-function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin)
-% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011preproc(insig, fs, varargin)
+function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011(insig, fs, varargin)
+% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011(insig, fs, varargin)
 %
 % 1. Description:
 %  Auditory model from van Dorp et. al. 2011
-%   Usage: [outsig, fc, par] = dorp2011preproc(insig,fs);
-%          [outsig, fc, par] = dorp2011preproc(insig,fs,...);
+%   Usage: [outsig, fc, par] = dorp2011(insig,fs);
+%          [outsig, fc, par] = dorp2011(insig,fs,...);
 %
 %   Input parameters:
 %        insig  : input (acoustic) signal
@@ -101,8 +101,12 @@ if ~isnumeric(fs) || ~isscalar(fs) || fs<=0
   error('%s: fs must be a positive scalar.',upper(mfilename));
 end;
 
-definput.import = {'dorp2011','auditoryfilterbank_','ihcenvelope','adaptloop_'};
-definput.importdefaults={'gtf_dorp','ihc_breebaart','adt_dorp'};
+% arg_auditoryfilterbank_.m needs to be integrated in AMT 1.0
+% arg_adaptloop_.m: now is deprecated because now the config 'adt_breebaart2001' 
+%     in arg_adaptloop.m is correctly using lim=0 (it was not the case for
+%     older versions of AMT)
+definput.import = {'dorp2011','auditoryfilterbank_','ihcenvelope','adaptloop'};
+definput.importdefaults={'gtf_dorp2011','ihc_breebaart2001','adt_breebaart2001'};
 definput.keyvals.subfs=[];
 
 [flags,keyvals,flow,fhigh,basef]  = ltfatarghelper({'flow','fhigh','basef'},definput,varargin);
