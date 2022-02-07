@@ -1,7 +1,7 @@
 # Binaural auditory model RAA
 Binaural auditory model using the AMT Toolbox framework, as used in the paper "Predicting perceived reverberation in diferent room acoustic environments using a binaural auditory model".
 
-After you have installed this toolbox (see below) you just need to run the script **exp_osses2017.m**. This script will load the waveforms that are stored under the **auxdata** which in turn will be feed into the binaural model. The binaural model is coded in **osses2017.m** following the conventions of AMT 1.0.
+After you have installed this toolbox (see below) you just need to run the script **exp_osses2017.m**. This script will load the waveforms that are stored under the **auxdata** which in turn will be feed into the binaural model. The script **Run_RAA** will take the sound file names and will reshape/preprocess the sounds before they are fed into the binaural model, which is coded in the script **dorp2013.m** following the conventions of AMT 1.0.
 
 # Installation
 The following are the general instructions to get the binaural auditory model (RAA) for MATLAB operative in your computer. The toolbox has been tested on Windows and Linux, using MATLAB (versions R2012b-R2020b).
