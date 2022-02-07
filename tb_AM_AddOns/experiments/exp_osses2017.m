@@ -49,7 +49,7 @@ if bCalc
     N = length(files);
     for i = 1:N
         fprintf('Processing file %.0f of %.0f\n',i,N);
-        [pRev(i,:),Level(i,:),outputs] = osses2017([dir_where files{i}],dBFS);
+        [pRev(i,:),Level(i,:),outputs] = Run_RAA([dir_where files{i}],dBFS);
     end
 
     pRev_est = reshape(pRev(:,1),8,6);

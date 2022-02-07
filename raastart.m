@@ -27,8 +27,13 @@ subdirs = il_get_AM_AddOns_paths(dir);
 for i = 1:length(subdirs)
   addpath(subdirs{i})
 end
-dir = [dirmain 'tb_AM' filesep]; addpath(dir);
-amtstart;
+if exist('amt_start.m','file')
+    amt_start;
+    % dir = [dirmain 'tb_AM' filesep]; addpath(dir);
+    % amt_start;
+else
+    fprintf('Please download the latest version of AMT toolbox (amtoolbox.org/) and run amt_start before starting to use the RAA model\n');
+end
 
 dir = [dirmain 'Utility' filesep]; addpath(dir);
 

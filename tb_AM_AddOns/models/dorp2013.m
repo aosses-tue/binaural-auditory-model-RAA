@@ -1,5 +1,5 @@
-function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011(insig, fs, varargin)
-% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2011(insig, fs, varargin)
+function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2013(insig, fs, varargin)
+% function [outsig, fc, par, Psi_dir, Psi_rev] = dorp2013(insig, fs, varargin)
 %
 % 1. Description:
 %  Auditory model from van Dorp et. al. 2011
